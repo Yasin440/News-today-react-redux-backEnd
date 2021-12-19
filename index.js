@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const ObjectId = require('mongodb').ObjectId;
 const { MongoClient } = require("mongodb");
+const fileUpload = require('express-fileupload');
 require("dotenv").config();
 
 const app = express();
@@ -10,6 +11,7 @@ const port = process.env.PORT || 5000
 //middleware
 app.use(cors());
 app.use(express.json());
+app.use(fileUpload());
 
 //linked to mongoDB
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.nort6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -26,6 +28,24 @@ async function run() {
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
+            res.json(result);
+        })
+        //POST API to add news in newsCollection
+        app.post('/addNews', async (req, res) => {
+            const by = req.body.by;
+            const name = req.body.name;
+            const email = req.body.email;
+            const category = req.body.category;
+            const date = req.body.date;
+            const details = req.body.details;
+            const picData = req.files.picture.data;
+            const encodedPic = picData.toString('base64');
+            const imgBuffer = Buffer.from(encodedPic, 'base64');
+            const newCar =
+            {
+                name, email, category, by, date, picture: imgBuffer, details
+            }
+            const result = await newsCollection.insertOne(newCar);
             res.json(result);
         })
         //------put client through gmail or other authentication
@@ -63,6 +83,13 @@ async function run() {
             res.send(result);
             console.log(result);
 
+        })
+        //get api for one car doc with id query
+        app.get('/newsDetails/:_id', async (req, res) => {
+            const id = req.params._id;
+            const query = { _id: ObjectId(id) };
+            const result = await newsCollection.findOne(query);
+            res.send(result);
         })
 
     }
