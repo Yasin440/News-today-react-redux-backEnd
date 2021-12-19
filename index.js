@@ -38,6 +38,12 @@ async function run() {
             res.json(result);
 
         })
+        // == get last 6 news from news
+        app.get('/latestNews', async (req, res) => {
+            const cursor = newsCollection.find().sort({ $natural: -1 }).limit(6);
+            const latestNews = await cursor.toArray();
+            res.send(latestNews);
+        })
         //== get api to get a email which is admin==//
         app.get('/client/isAdmin/:email', async (req, res) => {
             const email = req.params.email;
