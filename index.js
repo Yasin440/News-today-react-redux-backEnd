@@ -18,6 +18,46 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect();
+        const database = client.db('news-today');
+        const usersCollection = database.collection("users");
+        const newsCollection = database.collection("news");
+
+        //POST API to add user through email and pass
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+            res.json(result);
+        })
+        //------put client through gmail or other authentication
+        app.put('/users', async (req, res) => {
+            const user = req.body;
+            const query = { email: user.email };
+            const options = { upsert: true };
+            const updateUser = { $set: user };
+            const result = await usersCollection.updateOne(query, updateUser, options);
+            res.json(result);
+
+        })
+        //== get api to get a email which is admin==//
+        app.get('/client/isAdmin/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const result = await usersCollection.findOne(query);
+            let isAdmin = false;
+            if (result?.role === 'admin') {
+                isAdmin = true;
+            }
+            res.json({ admin: isAdmin });
+        })
+        //==GET api to find admin from user==//
+        app.get('/client/allAdmin', async (req, res) => {
+            const IsAdmin = "admin";
+            const query = { role: IsAdmin };
+            const result = await usersCollection.find(query);
+            res.send(result);
+            console.log(result);
+
+        })
 
     }
     finally {
