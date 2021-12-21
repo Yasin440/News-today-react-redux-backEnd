@@ -43,7 +43,7 @@ async function run() {
             const imgBuffer = Buffer.from(encodedPic, 'base64');
             const newCar =
             {
-                name, email, category, by, date, picture: imgBuffer, details
+                name, email, category, by, date, picture2: imgBuffer, details
             }
             const result = await newsCollection.insertOne(newCar);
             res.json(result);
@@ -81,7 +81,6 @@ async function run() {
             const query = { role: IsAdmin };
             const result = await usersCollection.find(query);
             res.send(result);
-            console.log(result);
 
         })
         //get api for one car doc with id query
@@ -90,6 +89,15 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const result = await newsCollection.findOne(query);
             res.send(result);
+        })
+        //get news with category
+        app.get('/news/:topic', async (req, res) => {
+            const topic = req.params.topic;
+            const query = { category: topic }
+            const cursor = newsCollection.find(query);
+            const result = await cursor.toArray()
+            res.send(result);
+            console.log(result);
         })
 
     }
