@@ -64,6 +64,12 @@ async function run() {
             const latestNews = await cursor.toArray();
             res.send(latestNews);
         })
+        // == get all news
+        app.get('/allLatestNews', async (req, res) => {
+            const cursor = newsCollection.find().sort({ $natural: -1 });
+            const latestNews = await cursor.toArray();
+            res.send(latestNews);
+        })
         //== get api to get a email which is admin==//
         app.get('/client/isAdmin/:email', async (req, res) => {
             const email = req.params.email;
@@ -83,6 +89,15 @@ async function run() {
             res.send(result);
 
         })
+        //***/== Put api to update client admin role ==/***//
+        app.put('/user/makeAdmin', async (req, res) => {
+            const user = req.body;
+            const query = { email: user.email };
+            const updateDoc = { $set: { role: 'admin' } }
+            const result = await usersCollection.updateOne(query, updateDoc);
+            res.json(result);
+
+        })
         //get api for one car doc with id query
         app.get('/newsDetails/:_id', async (req, res) => {
             const id = req.params._id;
@@ -94,10 +109,9 @@ async function run() {
         app.get('/news/:topic', async (req, res) => {
             const topic = req.params.topic;
             const query = { category: topic }
-            const cursor = newsCollection.find(query);
+            const cursor = newsCollection.find(query).sort({ $natural: -1 });
             const result = await cursor.toArray()
             res.send(result);
-            console.log(result);
         })
 
     }
