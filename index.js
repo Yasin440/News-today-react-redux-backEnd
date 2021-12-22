@@ -76,8 +76,9 @@ async function run() {
         })
         // == get last 6 news from news
         app.get('/latestNews', async (req, res) => {
-            const cursor = newsCollection.find().sort({ $natural: -1 }).limit(15);
-            const latestNews = await cursor.toArray();
+            const cursor = newsCollection.find();
+            const sort = cursor.sort({ $natural: -1 }).limit(15);
+            const latestNews = await sort.toArray();
             res.send(latestNews);
         })
         // == get all news
