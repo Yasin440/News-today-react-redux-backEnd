@@ -23,7 +23,20 @@ async function run() {
         const database = client.db('news-today');
         const usersCollection = database.collection("users");
         const newsCollection = database.collection("news");
+        const clientsRating = database.collection("rating");
 
+        //***/== POST API to add ratings ==/***//
+
+        app.post('/ratings', async (req, res) => {
+            const rating = req.body;
+            const result = await clientsRating.insertOne(rating);
+            res.json(result);
+        })
+        //== get review
+        app.get('/getAllReviews', async (req, res) => {
+            const result = await clientsRating.find().sort({ $natural: -1 }).toArray();
+            res.send(result);
+        })
         //POST API to add user through email and pass
         app.post('/users', async (req, res) => {
             const user = req.body;
