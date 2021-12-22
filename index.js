@@ -83,6 +83,13 @@ async function run() {
             const latestNews = await cursor.toArray();
             res.send(latestNews);
         })
+        //delete api to delete one news from all cars
+        app.delete('/all_News/delete/:_id', async (req, res) => {
+            const id = req.params._id;
+            const query = { _id: ObjectId(id) };
+            const result = await newsCollection.deleteOne(query);
+            res.json(result);
+        })
         //== get api to get a email which is admin==//
         app.get('/client/isAdmin/:email', async (req, res) => {
             const email = req.params.email;
