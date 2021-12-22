@@ -69,7 +69,10 @@ async function run() {
             const updateUser = { $set: user };
             const result = await usersCollection.updateOne(query, updateUser, options);
             res.json(result);
-
+        })
+        //== get all admin to show
+        app.get('/users/adminList', async (req, res) => {
+            res.send(await usersCollection.find({ role: 'admin' }).toArray());
         })
         // == get last 6 news from news
         app.get('/latestNews', async (req, res) => {
